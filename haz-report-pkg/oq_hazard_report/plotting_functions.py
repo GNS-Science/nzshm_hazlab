@@ -1,4 +1,3 @@
-from operator import inv
 from oq_hazard_report.base_functions import *
 
 from uuid import RESERVED_FUTURE
@@ -14,7 +13,7 @@ def plot_hazard_curve(ax, site_list, imt, xlim, ylim, results,
                         quant=False,
                         show_rlz=True,
                         intensity_type='acc',
-                        xscale='linear'):
+                        xscale='linear',custom_label=None, color=None):
     """
     plot hazard curves
 
@@ -54,15 +53,20 @@ def plot_hazard_curve(ax, site_list, imt, xlim, ylim, results,
     """
     
     imtls = results['metadata'][f'{intensity_type}_imtls']
-    hcurves_rlzs = np.array(results['hcurves']['hcurves_rlzs'])
+    
     hcurves_stats = np.array(results['hcurves']['hcurves_stats'])
     sites = pd.DataFrame(results['metadata']['sites'])
     quantiles = results['metadata']['quantiles']
+
+    if show_rlz:
+        hcurves_rlzs = np.array(results['hcurves']['hcurves_rlzs']) 
     
     imt_idx = list(imtls.keys()).index(imt)  
     
     for i_site,site in enumerate(site_list):
-        color = 'C%s'%i_site
+        if not color:
+            color = 'C%s'%i_site
+                
         if legend_type == 'quant':
             color_m = 'r'
         else:
@@ -71,10 +75,13 @@ def plot_hazard_curve(ax, site_list, imt, xlim, ylim, results,
         site_idx = sites.loc[site,'sids']
         
         if mean:
-            if legend_type == 'site':
-                label = site
-            elif legend_type == 'quant':
-                label = 'mean'
+            if custom_label:
+                label = custom_label
+            else:
+                if legend_type == 'site':
+                    label = site
+                elif legend_type == 'quant':
+                    label = 'mean'
 
             ls = '-'
             lw = 5
@@ -84,15 +91,18 @@ def plot_hazard_curve(ax, site_list, imt, xlim, ylim, results,
             _ = ax.plot(imtls[imt],hcurves_stats[site_idx,imt_idx,:,0],color=color_m,lw=lw,ls=ls,label=label)
         
         if median:
-            if legend_type == 'site':
-                label = site
-            elif legend_type == 'quant':
-                label = 'median (p50)'
+            if custom_label:
+                label = custom_label
+            else:
+                if legend_type == 'site':
+                    label = site
+                elif legend_type == 'quant':
+                    label = 'median (p50)'
 
             q_idx = quantiles.index(0.5)+1
             ls = '-'
-            lw = 5
-            _ = ax.plot(imtls[imt],hcurves_stats[site_idx,imt_idx,:,q_idx],color='k',lw=lw,ls=ls)
+            lw = 4
+            # _ = ax.plot(imtls[imt],hcurves_stats[site_idx,imt_idx,:,q_idx],color='k',lw=lw,ls=ls)
             ls = '-'
             lw = 3
             _ = ax.plot(imtls[imt],hcurves_stats[site_idx,imt_idx,:,q_idx],color=color_m,lw=lw,ls=ls,label=label)
@@ -104,8 +114,7 @@ def plot_hazard_curve(ax, site_list, imt, xlim, ylim, results,
                 label = ''
 
             ls = '--'
-            lw = 2
-
+            lw = 1.5
             q_idx = quantiles.index(0.1)+1
             _ = ax.plot(imtls[imt],hcurves_stats[site_idx,imt_idx,:,q_idx],color=color_m,lw=lw,ls=ls,label=label)
             q_idx = quantiles.index(0.9)+1
@@ -147,7 +156,10 @@ def plot_hazard_curve(ax, site_list, imt, xlim, ylim, results,
     
     _ = ax.grid(color='lightgray')
     
-    _ = ax.set_xlabel('Shaking Intensity, %s [g]'%imt)
+    if intensity_type=='acc':
+        _ = ax.set_xlabel('Shaking Intensity, %s [g]'%imt)
+    elif intensity_type=='disp':
+        _ = ax.set_xlabel('Displacement, %s [m]'%imt)
     _ = ax.set_ylabel('Annual Probability of Exceedance')
 
 
@@ -296,10 +308,13 @@ def plot_spectrum(ax,site,rp,results,inv_time,legend_type='site',color='C0',mean
     if mean or median:
         _ = ax.legend(handlelength=2)
     
-        _ = ax.grid(color='lightgray')
+    _ = ax.grid(color='lightgray')
         
-        _ = ax.set_xlabel('Period [s]')
+    _ = ax.set_xlabel('Period [s]')
+    if intensity_type=='acc':
         _ = ax.set_ylabel('Shaking Intensity [g]')
+    elif intensity_type=='disp':
+        _ = ax.set_ylabel('Displacement [m]')
 
     xlim = [0, max(periods)]
     ylim = ax.get_ylim()
@@ -322,3 +337,5 @@ def retrieve_design_intensities(results,intensity_type,design_type,imt,rp=500):
         im_values_stats = np.squeeze(np.array(results[design_type][intensity_type]['stats_im_hazard'])[:,imt_idx,im_idx,:])
         
     return im_values_rlzs, im_values_stats
+
+

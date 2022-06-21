@@ -64,6 +64,7 @@ def find_site_names(sites,dtol=0.001):
         location_codes[loc['name']] = {'id':loc['id'],'latitude':loc['latitude'],'longitude':loc['longitude']}
     location_codes = pd.DataFrame(location_codes).transpose()
 
+
     sites.loc[0,'name'] = 'dummy'
     if 'custom_site_id' in sites:
         for i in sites.index:
@@ -78,6 +79,6 @@ def find_site_names(sites,dtol=0.001):
     else:
         for i in sites.index:
             sites.loc[i,'name'] = name_from_latlon(sites.loc[i,'lat'], sites.loc[i,'lon'], location_codes, dtol)
-        
+    
     return sites.set_index('name')
 
