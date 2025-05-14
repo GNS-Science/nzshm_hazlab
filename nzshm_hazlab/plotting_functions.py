@@ -3,6 +3,7 @@ import pandas as pd
 from pandas import DataFrame
 from matplotlib.pylab import Axes, Line2D
 from typing import List, Dict
+import matplotlib.pyplot as plt
 from nzshm_common.location import CodedLocation
 from nzshm_hazlab.base_functions import period_from_imt, imt_from_period
 from nzshm_hazlab.data_functions import ( 
@@ -21,6 +22,20 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 AXIS_FONTSIZE = 28
 TICK_FONTSIZE = 22
+
+def set_plot_formatting():    
+    # set up plot formatting
+    SMALL_SIZE = 12
+    MEDIUM_SIZE = 16
+    BIGGER_SIZE = 25
+
+    plt.rc('font', size=SMALL_SIZE)  # controls default text sizes
+    plt.rc('axes', titlesize=MEDIUM_SIZE)  # fontsize of the axes title
+    plt.rc('axes', labelsize=MEDIUM_SIZE)  # fontsize of the x and y labels
+    plt.rc('xtick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
+    plt.rc('ytick', labelsize=SMALL_SIZE)  # fontsize of the tick labels
+    plt.rc('legend', fontsize=SMALL_SIZE)  # legend fontsize
+    plt.rc('figure', titlesize=BIGGER_SIZE)  # fontsize of the figure title
 
 def extract_hazard_curve(
         hazard_data: DataFrame,
