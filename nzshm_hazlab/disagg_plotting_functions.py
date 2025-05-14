@@ -109,61 +109,6 @@ def plot_mag_dist_trt_2d(fig, ax, disagg, bins, xlim=None, ylim=None):
     fig.supylabel('Distance (km)')
 
 
-def plot_mag_dist_trt_2d_v2(fig, ax, disagg, bins, xlim=None, ylim=None, cmin=None, cmax=None):
-
-    xlim = XLIM if xlim is None else xlim
-    ylim = YLIM if ylim is None else ylim
-
-    disaggs_r = prob_to_rate(disagg)
-
-    disagg_trt_r = np.sum(disaggs_r,axis=(AXIS_MAG,AXIS_DIST,AXIS_EPS))
-    disagg_trt_r /= np.sum(disagg_trt_r)
-    disagg_trt_r *= 100.0
-    for i in range(3):
-        ax[0,i].bar([bins[AXIS_TRT][i]], [disagg_trt_r[i]], width=0.6)
-        ax[0,i].set_ylim([0, 110])
-        ax[0,i].get_xaxis().set_ticks([])
-        ax[0,i].set_title(TRTS[i])
-        ax[0,i].set_xbound(-1.0 ,1.0)
-
-    for axs in ax[0,1:]:
-        axs.get_yaxis().set_ticks([])
-    
-    ax[0,0].set_ylabel('% Contribution\nto Hazard', wrap=True)
-
-    disaggs_trt0_r = prob_to_rate(disagg.copy()[:,:,0,:])
-    disaggs_trt1_r = prob_to_rate(disagg.copy()[:,:,1,:])
-    disaggs_trt2_r = prob_to_rate(disagg.copy()[:,:,2,:])
-
-    disagg_md_trt0_r = np.sum(disaggs_trt0_r,axis=(AXIS_EPS-1))
-    disagg_md_trt1_r = np.sum(disaggs_trt1_r,axis=(AXIS_EPS-1))
-    disagg_md_trt2_r = np.sum(disaggs_trt2_r,axis=(AXIS_EPS-1))
-
-    disagg_md_trt0_r = disagg_md_trt0_r/np.sum(disaggs_r) * 100
-    disagg_md_trt1_r = disagg_md_trt1_r/np.sum(disaggs_r) * 100
-    disagg_md_trt2_r = disagg_md_trt2_r/np.sum(disaggs_r) * 100
-
-    if cmax is None:
-        cmax = max(np.max(disagg_md_trt0_r), np.max(disagg_md_trt1_r), np.max(disagg_md_trt2_r))
-    if cmin is None:
-        cmin = 0
-
-    x, y = np.meshgrid(bins[AXIS_MAG],bins[AXIS_DIST])
-    pcx = ax[1,0].pcolormesh(x,y,disagg_md_trt0_r.transpose(),vmin=cmin,vmax=cmax,shading='auto',cmap=newcmp)
-    pcx = ax[1,1].pcolormesh(x,y,disagg_md_trt1_r.transpose(),vmin=cmin,vmax=cmax,shading='auto',cmap=newcmp)
-    pcx = ax[1,2].pcolormesh(x,y,disagg_md_trt2_r.transpose(),vmin=cmin,vmax=cmax,shading='auto',cmap=newcmp)
-    fig.colorbar(pcx, ax=ax, label=f'% Contribution to Hazard')
-
-    for axs in ax[1,1:]:
-        axs.get_yaxis().set_ticks([])
-
-    for axs in ax[1,:]:
-        axs.set_xlim(xlim)
-        axs.set_ylim(ylim)
-    ax[1,1].set_xlabel('Magnitude')
-    ax[1,0].set_ylabel('Distance (km)')
-    # fig.supylabel('Distance (km)')
-
 def plot_single_mag_dist_eps(fig, ax, disagg, bins, ylim, min_mag_bin_width = 0):
 
     ls = LightSource(azdeg=45, altdeg=10)
