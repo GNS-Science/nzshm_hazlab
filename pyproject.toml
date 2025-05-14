@@ -1,38 +1,30 @@
 [tool.poetry]
 name = "nzshm-hazlab"
 version = "0.1.0"
-description = "A laboratory for exploring hazard models"
+description = "A library for exploring and generating plots of seismic hazard models"
 authors = ["chrisdicaprio <christopher.dicaprio@gmail.com>"]
 license = "AGPL-3.0"
 readme = "README.md"
 packages = [{include = "nzshm_hazlab"}]
 
 [tool.poetry.dependencies]
-python = ">=3.10,<3.13"
+python = ">=3.11,<3.13"
 matplotlib = "^3.6.2"
-ipython = {version = "^8.7.0", optional = true}
 pyqt5 = {version = "^5.15.7", optional = true}
 markdown = "^3.4.1"
-pygmt = "^0.8.0"
-notebook = {version = "^6.5.3", optional = true}
 toml = "^0.10.2"
 xmltodict = "^0.13.0"
-boto3 = "^1.34.62"
-pympler = "^1.0.1"
-pyarrow = "^16.0.0"
-toshi-hazard-store = {git = "https://github.com/GNS-Science/toshi-hazard-store.git"}
-solvis = {git = "https://github.com/GNS-Science/solvis.git", rev = "pre-release"}
-jupyterlab = "^4.3.5"
-
-[tool.poetry.extras]
-ipython = ["ipython", "pyqt5"]
-runzi = ["nzshm-runzi"]
-jupyter = ["notebook"]
-openquake = ["openquake-engine"]
-thp = ["toshi-hazard-post"]
+solvis = "^1.0.0"
+nzshm-common = "^0.8.4"
+toshi-hazard-store = {git = "https://github.com/GNS-Science/toshi-hazard-store.git", rev = "pre-release-v1.0"}
+pygmt = "^0.15.0"
 
 [tool.poetry.group.dev.dependencies]
-mypy = "^0.991"
+mypy = "^1.15.0"
+flake8 = "^7.2.0"
+black = "^25.1.0"
+isort = "^6.0.1"
+tox = "^4.26.0"
 
 [build-system]
 requires = ["poetry-core"]
