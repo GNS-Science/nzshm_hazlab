@@ -37,3 +37,26 @@ def compute_hazard_at_poe(levels: NDArray,values: NDArray, poe: float, inv_time:
         for row_i in range(values.shape[0]):
             haz[row_i] = interp_hazard(levels, values[row_i,:], poe, inv_time)
     return haz
+
+def get_poe_df(hazard: DataFrame, locations: List[CodedLocation], imt, agg, poe, inv_time):
+
+    hazard = hazard.loc[(hazard['agg'] == agg) & (hazard['imt'] == imt)]
+    hazard['location_code'] = hazard['lat'] + '~' + hazard['lon']
+    location_codes = [loc.code for loc in locations]
+    hazard = hazard[hazard['location_code'].isin(location_codes)]
+
+    hazard = hazard.drop(labels=['lat','lon','imt','agg'], axis=1)\
+        .pivot(index='location_code', columns='level')
+    ordered_loc_codes = hazard.index
+    hazard = hazard.droplevel(0, axis=1)
+    levels = hazard.columns.to_numpy()
+    hazard.index = range(0,len(locations))
+    hazard.columns.name = None
+    level_at_poe = compute_hazard_at_poe(levels, hazard.to_numpy(), poe, inv_time)
+    
+    haz_poe = pd.DataFrame(columns = ['lat', 'lon', 'level'], index = range(len(ordered_loc_codes)), dtype='float64')
+    haz_poe['level'] = level_at_poe
+    haz_poe['lat'] = [float(loc.split('~')[0]) for loc in ordered_loc_codes]
+    haz_poe['lon'] = [float(loc.split('~')[1]) for loc in ordered_loc_codes]
+    
+    return haz_poe
